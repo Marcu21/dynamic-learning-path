@@ -1,0 +1,149 @@
+# Backend .gitignore for FastAPI/Python application
+
+# ===================
+# PYTHON
+# ===================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===================
+# VIRTUAL ENVIRONMENTS
+# ===================
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+.env
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ===================
+# DATABASE FILES
+# ===================
+*.db
+*.sqlite
+*.sqlite3
+dlp.db
+
+# ===================
+# TESTING
+# ===================
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ===================
+# JUPYTER NOTEBOOK
+# ===================
+.ipynb_checkpoints
+
+# ===================
+# CELERY
+# ===================
+celerybeat-schedule
+celerybeat.pid
+
+# ===================
+# ENVIRONMENT VARIABLES
+# ===================
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+
+# ===================
+# LOGS
+# ===================
+*.log
+logs/
+
+# ===================
+# MYPY
+# ===================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ===================
+# PYRE
+# ===================
+.pyre/
+
+# ===================
+# PYENV
+# ===================
+.python-version
+
+# ===================
+# PIPENV
+# ===================
+Pipfile.lock
+
+# ===================
+# POETRY
+# ===================
+poetry.lock
+
+# ===================
+# FASTAPI/UVICORN
+# ===================
+.uvicorn.pid
+
+# ===================
+# REDIS DUMPS
+# ===================
+dump.rdb
+
+# ===================
+# AI/ML MODELS (if any)
+# ===================
+*.pkl
+*.joblib
+*.h5
+*.model
+
+# ===================
+# TEMPORARY FILES
+# ===================
+*.tmp
+*.temp
+.cache/
+
+codebase.md

@@ -1,0 +1,43 @@
+# Core framework
+fastapi[all]
+uvicorn[standard]
+gunicorn
+
+# Database
+sqlalchemy
+psycopg2-binary
+asyncpg
+
+# Environment & Configuration
+python-dotenv
+pydantic-settings
+
+# Logging
+colorlog
+
+# AI & LLM
+openai
+langchain
+langchain-community
+langchain_openai
+langgraph
+
+# Platform APIs
+google-api-python-client
+youtube-search-python
+
+# Web scraping & requests
+requests
+beautifulsoup4
+
+# Redis & Celery (for background tasks)
+redis
+celery
+flower
+
+# HTTP client
+aiohttp
+
+# Authentication
+sendgrid
+python-jose

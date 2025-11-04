@@ -1,0 +1,29 @@
+# Core framework
+fastapi[all]
+uvicorn[standard]
+
+# Database
+sqlalchemy
+
+# Environment & Configuration
+python-dotenv
+pydantic-settings
+
+# Logging
+structlog
+colorlog
+
+# AI & LLM
+openai
+langchain
+langchain-community
+langchain_openai
+langgraph
+
+# Platform APIs
+google-api-python-client
+youtube-search-python
+
+# Web scraping & requests
+requests
+beautifulsoup4

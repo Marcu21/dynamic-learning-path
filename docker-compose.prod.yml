@@ -1,0 +1,427 @@
+version: '3.8'
+
+services:
+  # Postgresql Database Service
+  postgres_db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./be/app/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432" # Optional: for connecting from your host machine
+    container_name: postgres_db
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Service for Celery
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: |
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+      --timeout 300
+      --maxclients 1000
+      --tcp-backlog 511
+      --databases 16
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    container_name: redis_celery
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 120s
+      retries: 3
+      start_period: 100s
+
+  # FastAPI Backend Service
+  backend:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    environment:
+      # Application Settings
+      - APP_NAME=${APP_NAME:-DynamicLearningPath}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - SERVER_URL=${SERVER_URL:-http://localhost:8001}
+      # LLM Configuration
+      - LLM_URL=${LLM_URL:-https://api.openai.com/v1}
+      - LLM_MODEL=${LLM_MODEL:-o4-mini}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      # Database Settings
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
+      # Platform Service Keys
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET:-}
+      - COURSERA_API_KEY=${COURSERA_API_KEY:-}
+      - COURSERA_CLIENT_SECRET=${COURSERA_CLIENT_SECRET:-}
+      - COURSERA_APP_ID=${COURSERA_APP_ID:-}
+      # Authentication Settings
+      - SECRET_KEY=${SECRET_KEY:-}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1000}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - FROM_EMAIL=${FROM_EMAIL:-}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      # Redis Settings
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      # WebSocket Settings
+      - WEBSOCKET_URL=${WEBSOCKET_URL:-ws://backend:8001/api/v1/notifications/ws/notifications}
+      # Other Settings
+      - CORS_ORIGINS=${CORS_ORIGINS:-["http://localhost:3000","http://frontend:3000"]}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - GOOGLE_BOOKS_API_KEY=${GOOGLE_BOOKS_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-credentials.json
+    env_file:
+      - ./be/.env
+    ports:
+      - "8005:8001"
+    volumes:
+      - ./be/gcp-credentials.json:/app/gcp-credentials.json:ro
+    container_name: fastapi_backend
+    restart: unless-stopped
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
+      interval: 30s
+      timeout: 120s
+      retries: 3
+      start_period: 100s
+
+  # Celery Worker 1: path_generation, quiz_generation, module_insertion
+  celery-worker-path:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    environment:
+      # Application Settings
+      - APP_NAME=${APP_NAME:-DynamicLearningPath}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - SERVER_URL=${SERVER_URL:-http://localhost:8001}
+      # LLM Configuration
+      - LLM_URL=${LLM_URL:-https://api.openai.com/v1}
+      - LLM_MODEL=${LLM_MODEL:-o4-mini}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      # Database Settings
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
+      # Platform Service Keys
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET:-}
+      - COURSERA_API_KEY=${COURSERA_API_KEY:-}
+      - COURSERA_CLIENT_SECRET=${COURSERA_CLIENT_SECRET:-}
+      - COURSERA_APP_ID=${COURSERA_APP_ID:-}
+      # Authentication Settings
+      - SECRET_KEY=${SECRET_KEY:-}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1000}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - FROM_EMAIL=${FROM_EMAIL:-}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      # Redis Settings
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      # WebSocket Settings
+      - WEBSOCKET_URL=${WEBSOCKET_URL:-ws://backend:8001/api/v1/notifications/ws/notifications}
+      # Other Settings
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - GOOGLE_BOOKS_API_KEY=${GOOGLE_BOOKS_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-credentials.json
+    env_file:
+      - ./be/.env
+    volumes:
+      - ./be/gcp-credentials.json:/app/gcp-credentials.json:ro
+    command: celery -A app.celery_app worker --loglevel=info --concurrency=2 --pool=prefork --queues=path_generation,quiz_generation,module_insertion --hostname=path-worker@%h --max-tasks-per-child=50 --prefetch-multiplier=1
+    container_name: celery_worker_path
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 800M
+          cpus: '0.8'
+        reservations:
+          memory: 400M
+          cpus: '0.4'
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "celery", "-A", "app.celery_app", "inspect", "ping"]
+      interval: 30s
+      timeout: 120s
+      retries: 3
+      start_period: 100s
+
+  # Celery Worker 2: chat_assistant
+  celery-worker-chat:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    environment:
+      # Application Settings
+      - APP_NAME=${APP_NAME:-DynamicLearningPath}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - SERVER_URL=${SERVER_URL:-http://localhost:8001}
+      # LLM Configuration
+      - LLM_URL=${LLM_URL:-https://api.openai.com/v1}
+      - LLM_MODEL=${LLM_MODEL:-o4-mini}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      # Database Settings
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
+      # Platform Service Keys
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET:-}
+      - COURSERA_API_KEY=${COURSERA_API_KEY:-}
+      - COURSERA_CLIENT_SECRET=${COURSERA_CLIENT_SECRET:-}
+      - COURSERA_APP_ID=${COURSERA_APP_ID:-}
+      # Authentication Settings
+      - SECRET_KEY=${SECRET_KEY:-}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1000}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - FROM_EMAIL=${FROM_EMAIL:-}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      # Redis Settings
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      # WebSocket Settings
+      - WEBSOCKET_URL=${WEBSOCKET_URL:-ws://backend:8001/api/v1/notifications/ws/notifications}
+      # Other Settings
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - GOOGLE_BOOKS_API_KEY=${GOOGLE_BOOKS_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-credentials.json
+    env_file:
+      - ./be/.env
+    volumes:
+      - ./be/gcp-credentials.json:/app/gcp-credentials.json:ro
+    command: celery -A app.celery_app worker --loglevel=info --concurrency=3 --pool=prefork --queues=chat_assistant --hostname=chat-worker@%h --max-tasks-per-child=100 --prefetch-multiplier=1
+    container_name: celery_worker_chat
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 600M
+          cpus: '0.6'
+        reservations:
+          memory: 300M
+          cpus: '0.3'
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "celery", "-A", "app.celery_app", "inspect", "ping"]
+      interval: 30s
+      timeout: 120s
+      retries: 3
+      start_period: 100s
+
+  # Celery Beat Scheduler
+  celery-beat:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    environment:
+      # Application Settings
+      - APP_NAME=${APP_NAME:-DynamicLearningPath}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - SERVER_URL=${SERVER_URL:-http://localhost:8001}
+      # LLM Configuration
+      - LLM_URL=${LLM_URL:-https://api.openai.com/v1}
+      - LLM_MODEL=${LLM_MODEL:-o4-mini}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      # Database Settings
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
+      # Platform Service Keys
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET:-}
+      - COURSERA_API_KEY=${COURSERA_API_KEY:-}
+      - COURSERA_CLIENT_SECRET=${COURSERA_CLIENT_SECRET:-}
+      - COURSERA_APP_ID=${COURSERA_APP_ID:-}
+      # Authentication Settings
+      - SECRET_KEY=${SECRET_KEY:-}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1000}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - FROM_EMAIL=${FROM_EMAIL:-}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      # Redis Settings
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      # WebSocket Settings
+      - WEBSOCKET_URL=${WEBSOCKET_URL:-ws://backend:8001/api/v1/notifications/ws/notifications}
+      # Other Settings
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - GOOGLE_BOOKS_API_KEY=${GOOGLE_BOOKS_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-credentials.json
+    env_file:
+      - ./be/.env
+    volumes:
+      - celery_beat_data:/tmp
+      - ./be/gcp-credentials.json:/app/gcp-credentials.json:ro
+    command: celery -A app.celery_app beat --loglevel=info --schedule=/tmp/celerybeat-schedule
+    container_name: celery_beat
+    restart: unless-stopped
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # Flower - Celery Monitoring Dashboard
+  flower:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    environment:
+      # Application Settings
+      - APP_NAME=${APP_NAME:-DynamicLearningPath}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - SERVER_URL=${SERVER_URL:-http://localhost:8001}
+      # LLM Configuration
+      - LLM_URL=${LLM_URL:-https://api.openai.com/v1}
+      - LLM_MODEL=${LLM_MODEL:-o4-mini}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      # Database Settings
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_db:5432/${POSTGRES_DB}
+      # Platform Service Keys
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET:-}
+      - COURSERA_API_KEY=${COURSERA_API_KEY:-}
+      - COURSERA_CLIENT_SECRET=${COURSERA_CLIENT_SECRET:-}
+      - COURSERA_APP_ID=${COURSERA_APP_ID:-}
+      # Authentication Settings
+      - SECRET_KEY=${SECRET_KEY:-}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1000}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - FROM_EMAIL=${FROM_EMAIL:-}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      # Redis Settings
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      # WebSocket Settings
+      - WEBSOCKET_URL=${WEBSOCKET_URL:-ws://backend:8001/api/v1/notifications/ws/notifications}
+      # Other Settings
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - GOOGLE_BOOKS_API_KEY=${GOOGLE_BOOKS_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-credentials.json
+    command: celery -A app.celery_app flower --port=5555 --broker_api=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    container_name: celery_flower
+    restart: unless-stopped
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555"]
+      interval: 30s
+      timeout: 120s
+      retries: 3
+
+  # Next.js Frontend Service
+  frontend:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_WEBSOCKET_URL=${NEXT_PUBLIC_WEBSOCKET_URL:-ws://localhost:8001}
+    env_file:
+      - ./fe/.env
+    ports:
+      - "3005:3000"
+    container_name: nextjs_frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 120s
+      retries: 3
+      start_period: 100s
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  celery_beat_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

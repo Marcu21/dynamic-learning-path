@@ -1,0 +1,99 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      confirm_deployment:
+        description: 'Type "deploy" to confirm deployment'
+        required: true
+        default: ''
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
+  IMAGE_NAME_BACKEND: ${{ github.repository }}-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.inputs.confirm_deployment == 'deploy'
+    
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Cloudflared
+      run: |
+        echo "� Installing Cloudflared..."
+        wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+        sudo dpkg -i cloudflared-linux-amd64.deb
+        cloudflared --version
+
+    - name: Setup environment files
+      run: |
+        echo "📝 Creating environment files from secrets..."
+        
+        # Create backend .env.prod
+        echo "${{ secrets.BACKEND_ENV_PROD }}" > be/.env.prod
+        
+        # Create frontend .env.prod  
+        echo "${{ secrets.FRONTEND_ENV_PROD }}" > fe/.env.prod
+        
+        # Create GCP credentials
+        echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > be/gcp-credentials.json
+        
+        echo "✅ Environment files created successfully"
+
+    - name: Deploy to production server
+      env:
+        REMOTE_HOST: "ssh-interns.ccrolabs.com"
+        REMOTE_USER: "bocrarazvan"
+        REMOTE_PATH: "/Users/Shared/case-ai-dynamic-learning-path"
+        SSH_PASSWORD: ${{ secrets.PROD_SSH_PASSWORD }} 
+        CF_CLIENT_ID: ${{ secrets.CF_CLIENT_ID }}
+        CF_CLIENT_SECRET: ${{ secrets.CF_CLIENT_SECRET }}
+      run: |
+        echo "🚀 Starting deployment to production..."
+        
+        # Install sshpass for password authentication if needed
+        sudo apt-get update
+        sudo apt-get install -y sshpass
+        
+        # Make deploy script executable
+        chmod +x deploy.sh
+        
+        # Export environment variables for the deploy script
+        export REMOTE_HOST="$REMOTE_HOST"
+        export REMOTE_USER="$REMOTE_USER" 
+        export REMOTE_PATH="$REMOTE_PATH"
+        export SSH_PASSWORD="$SSH_PASSWORD"
+        
+        # Run the deployment script
+        ./deploy.sh
+        
+        echo "🎉 Deployment completed successfully!"
+        
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment successful!"
+          echo "🌐 Production environment updated"
+          echo "📊 Services should be running at your production URL"
+        else
+          echo "❌ Deployment failed!"
+          echo "🔍 Check the logs above for error details"
+          echo "💡 Common issues:"
+          echo "   - Cloudflare authentication failed"
+          echo "   - Production server unreachable"
+          echo "   - Environment secrets not properly configured"
+          echo "   - Docker build or startup errors"
+        fi

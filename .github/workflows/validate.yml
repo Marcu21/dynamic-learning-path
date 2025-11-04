@@ -1,0 +1,58 @@
+name: Validate CI/CD Setup
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/check-cicd.sh'
+
+jobs:
+  validate-setup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate CI/CD configuration
+      run: |
+        echo "🔍 Validating CI/CD setup..."
+        
+        # Make script executable
+        chmod +x scripts/check-cicd.sh
+        
+        # Run validation
+        ./scripts/check-cicd.sh
+        
+        echo "✅ CI/CD validation completed successfully!"
+
+    - name: Validate Docker configuration
+      run: |
+        echo "🐳 Validating Docker configuration..."
+        
+        # Set test environment variables for validation
+        export DATABASE_URL="sqlite:///./test.db"
+        export OPENAI_API_KEY="test_key"
+        export YOUTUBE_API_KEY="test_key"
+        export GOOGLE_BOOKS_API_KEY="test_key"
+        export SPOTIFY_CLIENT_ID="test_id"
+        export SPOTIFY_CLIENT_SECRET="test_secret"
+        export NEXT_PUBLIC_API_URL="http://localhost:8001"
+        touch be/.env
+        touch fe/.env
+        
+        # Check docker-compose syntax
+        docker compose config > /dev/null
+        docker compose -f docker-compose.prod.yml config > /dev/null
+        
+        echo "✅ Docker configuration is valid!"
+
+    - name: Validate workflow syntax
+      run: |
+        echo "⚙️ Validating GitHub Actions workflows..."
+        
+        # List all workflow files
+        find .github/workflows -name "*.yml" -o -name "*.yaml"
+        
+        echo "✅ All workflow files found!"

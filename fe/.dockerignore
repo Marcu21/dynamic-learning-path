@@ -1,0 +1,73 @@
+# .dockerignore for Next.js Frontend
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables (we include .env since it's needed in container)
+# .env files are needed for runtime configuration
+
+# Cache
+.eslintcache
+
+# Node
+node_modules/
+npm-debug.log
+.npm
+dist/
+build/
+.next/
+
+# IDEs and local config
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Backup directories (prevent build issues)
+*_backup/
+*backup/
+components_backup/
+context_backup/
+hooks_backup/
+lib_backup/
+pages_backup/
+types_backup/

@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- slider styles ---- */
+@layer components {
+    .slider-container {
+        @apply relative w-full h-8;
+        --track-primary: theme("colors.primary");
+        --track-secondary: theme("colors.neutral.secondary-light");
+    }
+
+    .slider-container input[type="range"] {
+        @apply absolute top-1/2 w-full h-2 -translate-y-1/2 appearance-none rounded bg-transparent outline-none;
+        background: linear-gradient(
+                to right,
+                var(--track-primary) var(--slider-progress, 0%),
+                var(--track-secondary) var(--slider-progress, 0%)
+        );
+    }
+
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+        @apply appearance-none w-6 h-6 rounded-full bg-primary border-4 border-white shadow-lg transition-transform;
+        margin-top: -8px; /* centrare */
+    }
+    .slider-container input[type="range"]::-moz-range-thumb {
+        @apply w-4 h-4 rounded-full bg-primary border-4 border-primary shadow-lg transition-transform;
+    }
+
+    .slider-container input[type="range"]::-webkit-slider-thumb:hover,
+    .slider-container input[type="range"]::-moz-range-thumb:hover {
+        transform: scale(1.1);
+    }
+    .slider-container input[type="range"]::-webkit-slider-thumb:active,
+    .slider-container input[type="range"]::-moz-range-thumb:active {
+        transform: scale(1.2);
+    }
+
+    .slider-container .slider-tooltip {
+        @apply pointer-events-none absolute -top-8 px-2 py-1 bg-primary-dark text-white text-xs rounded;
+        left: var(--slider-progress, 0%);
+        transform: translateX(-50%);
+        white-space: nowrap;
+    }
+}
+
+@layer utilities {
+    /* default square checkbox */
+    .checkbox {
+        @apply form-checkbox w-5 h-5 border-neutral-secondary rounded transition;
+    }
+    /* checked state uses brand */
+    .checkbox:checked {
+        @apply text-primary border-transparent;
+    }
+    /* focus ring */
+    .checkbox:focus {
+        @apply ring-2 ring-primary outline-none;
+    }
+    /* error outline */
+    .checkbox-error {
+        @apply form-checkbox w-5 h-5 border-alert rounded;
+    }
+    .checkbox-error:checked {
+        @apply text-alert border-transparent;
+    }
+    /* disabled style */
+    .checkbox:disabled {
+        @apply bg-neutral-accent-light cursor-not-allowed opacity-50;
+    }
+}
+
+
+@layer base {
+    /* 1) When the select itself is focused, give it your purple outline & border */
+    select:focus {
+        @apply outline-none ring-2 ring-primary border-primary;
+    }
+
+    /* 2) When hovering or keyboard-focusing options, use purple bg + white text */
+    select option:hover,
+    select option:focus {
+        background-color: theme("colors.primary");
+        color: theme("colors.white");
+    }
+}
+
+@layer utilities {
+    .animate-gradient {
+        /* make the gradient twice as big so it can slide */
+        background-size: 200% 200%;
+        animation: gradientBG 20s ease infinite;
+    }
+}
+
+@keyframes gradientBG {
+    0%   { background-position: 0%   50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0%   50%; }
+}
+
+/* 1. The shifting multi-color gradient */
+@keyframes auroraGradient {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+}
+
+/* animated gradient keyframes */
+@keyframes gradient-move {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+    animation: gradient-move 15s ease infinite;
+}
