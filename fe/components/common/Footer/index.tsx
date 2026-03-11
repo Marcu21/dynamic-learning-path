@@ -76,7 +76,7 @@ export default function Footer() {
             <div className="py-4">
               <div className="flex justify-center text-center border-b border-white/10">
                 <motion.p className={styles.copyText} animate={{ opacity: [0.7,1,0.7] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-                  © 2025 Skill Central. Made with{" "}
+                  © 2025 Dynamic Learning Path. Made with{" "}
                   <motion.span animate={{ scale:[1,1.2,1], color:["#ef4444","#f97316","#ef4444"] }} transition={{ duration:2, repeat:Infinity, ease:"easeInOut" }}>
                     ❤️
                   </motion.span>{" "}

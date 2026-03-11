@@ -1,6 +1,6 @@
 # 🐳 Docker Compose Guide
 
-This guide explains how to run the Skill Central AI application using Docker Compose.
+This guide explains how to run the Dynamic Learning Path AI application using Docker Compose.
 
 ## 📋 Prerequisites
 

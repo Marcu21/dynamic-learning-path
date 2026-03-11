@@ -1,4 +1,4 @@
-# Skill Central AI Application
+# Dynamic Learning Path AI Application
 
 [![CI Pipeline](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/ci.yml/badge.svg)](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/ci.yml)
 [![Deploy](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/deploy.yml/badge.svg)](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/deploy.yml)

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import { motion, AnimatePresence } from "framer-motion"
-import { User, Brain, Sparkles, Mail, CheckCircle, AlertCircle, X, AlertTriangle } from "lucide-react"
+import {User, Brain, Sparkles, Mail, CheckCircle, AlertCircle, X, AlertTriangle, GraduationCap} from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import ParticlesBackground from "@/components/background/ParticlesBackground"
 import { api } from "@/lib/api"
@@ -205,18 +205,12 @@ export default function LoginPage() {
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
               >
-                <Image
-                  src="/logo.png"
-                  alt="Site Logo"
-                  width={42}
-                  height={30}
-                  priority
-                  style={{
-                    width: '42px',
-                    height: 'auto',
-                    maxWidth: '42px',
-                    maxHeight: '30px'
-                  }}
+                <GraduationCap
+                  size={32}
+                  color="#ffffff"
+                  className="text-white"
+                  aria-label="Site Logo"
+                  strokeWidth={2}
                 />
                 <motion.div
                   className="absolute inset-0 rounded-full bg-primary"
@@ -229,7 +223,7 @@ export default function LoginPage() {
                 className="text-2xl font-display font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent"
                 style={{ backgroundSize: "200% 100%" }}
               >
-                Skill Central
+                Dynamic Learning Path
               </motion.h1>
 
               <motion.div

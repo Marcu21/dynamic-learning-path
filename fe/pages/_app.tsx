@@ -120,8 +120,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <NotificationProvider>
         <ChatProvider initialLocation="dashboard">
           <Head>
-            <link rel="icon" href="/favicon.png" />
-            <title>Skill Central</title>
+            <link rel="icon" href="/graduation-cap.svg" />
+            <title>Dynamic Learning Path</title>
           </Head>
           <AppLayout Component={Component} pageProps={pageProps} />
         </ChatProvider>

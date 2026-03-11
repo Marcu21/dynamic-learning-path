@@ -25,7 +25,7 @@ import {
   Rocket,
   BookOpen,
   FileText, Video,
-  Code
+  Code, GraduationCap
 } from 'lucide-react';
 import Link from "next/link";
 
@@ -281,8 +281,18 @@ const ImplementationSlideContent = () => {
       <motion.div className="w-full flex items-center justify-center min-h-[500px]">
         <div className="relative w-96 h-96 flex items-center justify-center">
           <motion.div className="absolute flex flex-col items-center justify-center bg-cyan-500/20 rounded-full w-48 h-48 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,152,216,0.5)]">
-            <Image src="/logo.png" alt="Skill Central Logo" width={70} height={70} priority />
-            <h3 className="text-xl font-bold my-2">Skill Central</h3>
+
+            <GraduationCap
+              size={70}
+              color="#ffffff"
+              className="text-white"
+              strokeWidth={1.5}
+            />
+
+            <h3 className="text-xl font-bold my-2 text-white text-center px-2">
+              Dynamic Learning Path
+            </h3>
+
           </motion.div>
 
           {modules.map((module, i) => {
@@ -342,7 +352,7 @@ const ImplementationSlideContent = () => {
     // Slide 1: Title
     {
       id: 0,
-      title: "Skill Central",
+      title: "Dynamic Learning Path",
       bgColor: "from-[#203878] via-[#134B8E] to-[#0098D8]",
       textColor: "text-white",
       content: (
@@ -364,18 +374,12 @@ const ImplementationSlideContent = () => {
                ease: "easeInOut"
              }}
            >
-             <Image
-              src="/logo.png"
-              alt="Skill Central Logo"
-              width={180}
-              height={144}
-              priority
-              style={{
-                width: 'auto',
-                height: '144px',
-                maxWidth: '180px',
-                maxHeight: '180px'
-              }}
+             <GraduationCap
+                size={144}
+                color="#ffffff"
+                className="text-white drop-shadow-lg"
+                aria-label="Dynamic Learning Path Logo"
+                strokeWidth={1.5}
               />
            </motion.div>
          </motion.div>
@@ -385,7 +389,7 @@ const ImplementationSlideContent = () => {
            className="text-8xl md:text-8xl font-extrabold tracking-tight leading-tight drop-shadow-[0_4px_24px_rgba(0,152,216,0.35)]"
            transition={{ type: "spring", stiffness: 180 }}
          >
-           Skill Central
+           Dynamic Learning Path
          </motion.h1>
 
          <motion.p
@@ -506,10 +510,10 @@ const ImplementationSlideContent = () => {
   )
 },
 
-    // Slide 3: SkillCentral at a Glance
+    // Slide 3: Dynamic Learning Path at a Glance
     {
       id: 2,
-      title: "Skill Central at a Glance",
+      title: "Dynamic Learning Path at a Glance",
       bgColor: "from-[#203878] via-[#134B8E] to-[#0098D8]",
       textColor: "text-white",
       content: (
@@ -523,7 +527,7 @@ const ImplementationSlideContent = () => {
             variants={fadeUp}
             className="text-6xl font-bold text-center mb-8"
           >
-            Skill Central <span className="text-cyan-300">at a Glance</span>
+            Dynamic Learning Path <span className="text-cyan-300">at a Glance</span>
           </motion.h1>
 
           <motion.div
@@ -590,7 +594,7 @@ const ImplementationSlideContent = () => {
             variants={fadeUp}
             className="text-6xl font-bold text-center mb-8"
           >
-            Manual Process <span className="text-red-400">(Without Skill Central)</span>
+            Manual Process <span className="text-red-400">(Without Dynamic Learning Path)</span>
           </motion.h1>
 
           {/* New 2x2 grid layout for the 4 cards */}
@@ -1424,7 +1428,7 @@ const ImplementationSlideContent = () => {
               variants={cardV}
               className="bg-red-500/10 backdrop-blur-lg rounded-2xl p-8 border border-red-300/30"
             >
-              <h3 className="text-3xl font-bold mb-6 text-red-300 text-center">Without Skill Central</h3>
+              <h3 className="text-3xl font-bold mb-6 text-red-300 text-center">Without Dynamic Learning Path</h3>
               <div className="space-y-6">
                 {[
                   { modules: "5 modules", time: "3:42" },
@@ -1451,7 +1455,7 @@ const ImplementationSlideContent = () => {
               custom={1}
               className="bg-green-500/10 backdrop-blur-lg rounded-2xl p-8 border border-green-300/30"
             >
-              <h3 className="text-3xl font-bold mb-6 text-green-300 text-center">With Skill Central</h3>
+              <h3 className="text-3xl font-bold mb-6 text-green-300 text-center">With Dynamic Learning Path</h3>
               <div className="space-y-6">
                 {[
                   { modules: "5 modules", time: "1:30", savings: "≈59% faster" },
@@ -1671,7 +1675,7 @@ const ImplementationSlideContent = () => {
      )
     },
 
-      {
+      /*{
        id: 12,
        title: "Our Team",
        bgColor: "from-[#203878] via-[#134B8E] to-[#0098D8]",
@@ -1714,7 +1718,7 @@ const ImplementationSlideContent = () => {
              >
                <Image
                  src="/team-picture.png"
-                 alt="Skill Central Team"
+                 alt="Dynamic Learning Path Team"
                  width={800}
                  height={500}
                  className="w-full h-auto object-cover"
@@ -1792,7 +1796,7 @@ const ImplementationSlideContent = () => {
            </motion.div>
          </motion.div>
        )
-      },
+      },*/
 
     // Slide 12: Call to Action
     {

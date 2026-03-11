@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {ArrowLeft, Sparkles} from 'lucide-react';
+import {ArrowLeft, GraduationCap, Sparkles} from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import Image from 'next/image';
 
@@ -77,18 +77,12 @@ export default function GenerationLoadingScreen({ messages, onBackToDashboard }:
       <motion.div
         className="mx-auto mb-6 w-20 h-20 bg-primary rounded-full flex items-center justify-center border-2 border-primary"
       >
-        <Image
-          src="/logo.png"
-          alt="Site Logo"
-          width={52}
-          height={44}
-          priority
-          style={{
-              width: 'auto',
-              height: '44px',
-              maxWidth: '52px',
-              maxHeight: '52px'
-            }}
+        <GraduationCap
+          size={44}
+          color="#ffffff"
+          className="text-white"
+          aria-label="Site Logo"
+          strokeWidth={2}
         />
       </motion.div>
 

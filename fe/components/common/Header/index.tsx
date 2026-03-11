@@ -6,7 +6,7 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import type { HeaderProps, Particle } from "@/components/common/Header/types";
 import * as anim from "@/components/common/Header/animations";
 import * as styles from "@/components/common/Header/styles";
-import { Menu, Sparkles, Bell, LogOut, UserCircle } from "lucide-react";
+import {Menu, Sparkles, Bell, LogOut, UserCircle, GraduationCap} from "lucide-react";
 import { useRouter } from 'next/router';
 import { useAuth } from "@/context/AuthContext";
 import { useNotifications } from "@/context/NotificationContext";
@@ -230,18 +230,12 @@ export default function Header({ username, onOpenSidebar }: HeaderProps) {
                   }}
                   transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <Image
-                    src="/logo.png"
-                    alt="Site Logo"
-                    width={28}
-                    height={24}
-                    priority
-                    style={{
-                      width: 'auto',
-                      height: '24px',
-                      maxWidth: '28px',
-                      maxHeight: '24px'
-                    }}
+                  <GraduationCap
+                    size={24}
+                    color="#ffffff"
+                    className="text-white shrink-0"
+                    aria-label="Site Logo"
+                    strokeWidth={2}
                   />
                 </motion.div>
               </motion.div>
@@ -253,7 +247,7 @@ export default function Header({ username, onOpenSidebar }: HeaderProps) {
                     scale: { type: "spring", stiffness: 300, damping: 15 },
                   }}
                 >
-                  Skill Central
+                  Dynamic Learning Path
                 </motion.h1>
                 <motion.p
                   className={styles.subtitle}

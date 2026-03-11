@@ -82,7 +82,7 @@ export default function Certificate({
     const fileName = `certificate_${pathTitle.replace(/\s+/g, '_').toLowerCase()}.png`;
     const file = new File([blob], fileName, { type: 'image/png' });
 
-    const shareText = `I just earned a Certificate of Achievement for completing the "${pathTitle}" learning path on Skill Central! 🎉`;
+    const shareText = `I just earned a Certificate of Achievement for completing the "${pathTitle}" learning path on Dynamic Learning Path! 🎉`;
     const shareData = {
       title: "Certificate of Achievement",
       text: shareText,
@@ -185,7 +185,7 @@ export default function Certificate({
                       </motion.div>
 
                       <div className="w-full text-xs text-neutral-dark">
-                        <p className="font-bold text-md mb-1">Skill Central</p>
+                        <p className="font-bold text-md mb-1">Dynamic Learning Path</p>
                         <p className="text-neutral-dark">Authorized Certificate</p>
                         <div className="w-32 border-b border-gray-400 mx-auto my-1"></div>
                         <p className="mt-2 text-neutral-dark flex items-center justify-center gap-2">
