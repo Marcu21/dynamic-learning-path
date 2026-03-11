@@ -1,27 +1,25 @@
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+import resend
 import logging
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 # SendGrid configuration from settings
-SENDGRID_API_KEY = settings.sendgrid_api_key
+RESEND_API_KEY = settings.resend_api_key
 FROM_EMAIL = settings.from_email
 FRONTEND_URL = settings.frontend_url
 
-if not SENDGRID_API_KEY or SENDGRID_API_KEY == "your-sendgrid-api-key-here":
-    logger.warning("SENDGRID_API_KEY not configured properly")
-
+if not RESEND_API_KEY or RESEND_API_KEY == "your-resend-api-key-here":
+    logger.warning("RESEND_API_KEY not configured properly")
+else:
+    resend.api_key = RESEND_API_KEY
 
 class EmailService:
-    def __init__(self):
-        self.sg = SendGridAPIClient(api_key=SENDGRID_API_KEY) if SENDGRID_API_KEY else None
     
     async def send_magic_link(self, email: str, token: str) -> bool:
         """Send magic link email for authentication"""
-        if not self.sg:
-            logger.error("SendGrid client not initialized")
+        if not resend.api_key:
+            logger.error("Resend API key not initialized")
             return False
         
         magic_link = f"{FRONTEND_URL}/auth/verify?token={token}"
@@ -122,18 +120,18 @@ class EmailService:
         </body>
         </html>
         """
-        
-        message = Mail(
-            from_email=FROM_EMAIL,
-            to_emails=[email],
-            subject="Your Login Link - Dynamic Learning Path",
-            html_content=html_content
-        )
-        
+
+        params = {
+            "from": FROM_EMAIL,
+            "to": [email],
+            "subject": "Your Login Link - Dynamic Learning Path",
+            "html": html_content
+        }
+
         try:
-            response = self.sg.send(message)
-            logger.info(f"Magic link email sent to {email}, status code: {response.status_code}")
-            return response.status_code == 202
+            response = resend.Emails.send(params)
+            logger.info(f"Magic link email sent to {email}, Resend ID: {response.get('id')}")
+            return True
         except Exception as e:
             logger.error(f"Failed to send magic link email to {email}: {str(e)}")
             return False

@@ -106,11 +106,11 @@ class Settings(BaseSettings):
         default=1000,
         description="JWT access token expiration time in minutes"
     )
-    
-    # SendGrid Email Settings
-    sendgrid_api_key: str = Field(
+
+    # Resend Email Settings
+    resend_api_key: str = Field(
         default="none",
-        description="SendGrid API key for email sending"
+        description="Resend API key for email sending"
     )
     
     from_email: str = Field(
@@ -378,8 +378,8 @@ def validate_configuration() -> bool:
         if settings.is_production:
             if settings.secret_key == "your-secret-key-change-this-in-production":
                 raise ValueError("Secret key must be changed in production")
-            if settings.sendgrid_api_key == "your-sendgrid-api-key-here":
-                raise ValueError("SendGrid API key must be configured in production")
+            if settings.resend_api_key == "your-resend-api-key-here" or settings.resend_api_key == "none":
+                raise ValueError("Resend API key must be configured in production")
             if settings.debug:
                 logger.warning("Debug mode should be disabled in production")
         
