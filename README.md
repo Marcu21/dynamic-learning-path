@@ -11,6 +11,16 @@ A full-stack AI-powered application that creates personalized learning paths by 
 - **Multi-Platform Content Search**: Integrates with YouTube, Google Books, and Spotify
 - **Intelligent Content Ranking**: Uses AI to select the most effective learning materials
 - **Progress Tracking**: Monitor learning progress and completion status
+- **Passwordless Authentication**: Secure login via magic link sent to the user’s email
+- **AI-Generated Quizzes**: Generates quizzes for each learning module so users can test their understanding
+- **Personalized AI Feedback**: Provides AI-generated feedback after each quiz
+- **Context-Aware Chatbot**: Answers user questions based on the current context, such as modules, quizzes, or dashboard content
+- **Editable Learning Paths**: Allows users to insert additional modules into an existing learning path for deeper exploration
+- **Team Learning**: Users can create and join teams using a shared access code
+- **Shared Team Paths**: Team leaders can create learning paths that are accessible to all team members
+- **Team Analytics**: Team leaders can track user and module-level progress across the team
+- **Certificates of Completion**: Users receive a certificate after completing a learning path
+- **Gamification**: User profiles include learning streaks, statistics, teams, and earned certificates
 - **Modern UI**: Beautiful, responsive interface built with Next.js and Tailwind CSS
 - **Real-time Streaming**: Live generation of learning content with progress updates
 
