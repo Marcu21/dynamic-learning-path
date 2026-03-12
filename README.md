@@ -1,8 +1,5 @@
 # Dynamic Learning Path AI Application
 
-[![CI Pipeline](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/ci.yml/badge.svg)](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/ci.yml)
-[![Deploy](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/deploy.yml/badge.svg)](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/actions/workflows/deploy.yml)
-
 A full-stack AI-powered application that creates personalized learning paths by intelligently searching and curating educational content from multiple platforms.
 
 ## 🚀 Features
@@ -45,8 +42,8 @@ A full-stack AI-powered application that creates personalized learning paths by 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/computacenter-ro/case-ai-dynamic-learning-path.git
-cd case-ai-dynamic-learning-path
+git clone https://github.com/Marcu21/dynamic-learning-path
+cd dynamic-learning-path
 ```
 
 ### 2. Environment Setup
@@ -132,7 +129,7 @@ curl http://localhost:3000
 docker-compose -f docker-compose.prod.yml up -d
 
 # Or using published images
-export GITHUB_REPOSITORY=computacenter-ro/case-ai-dynamic-learning-path
+export GITHUB_REPOSITORY=Marcu21/dynamic-learning-path
 docker-compose -f docker-compose.prod.yml pull
 docker-compose -f docker-compose.prod.yml up -d
 ```
@@ -210,22 +207,8 @@ docker-compose -f docker-compose.prod.yml up -d
 - Security vulnerability checks
 - Successful Docker builds
 
-## 🤝 Support
-
-- **Issues**: [GitHub Issues](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/computacenter-ro/case-ai-dynamic-learning-path/discussions)
-- **Documentation**: Check the `docs/` directory
-
-## 📄 License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
 ## 🙏 Acknowledgments
 
 - OpenAI for GPT models and embeddings
 - YouTube, Google Books, and Spotify for content APIs
 - The open-source community for amazing tools and libraries
-
----
-
-**Built with ❤️ by the Computacenter Romania Team**
